@@ -21,12 +21,11 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
    - Focus on delegating the heavy lifting (scraping, multi-page data extraction) to parallel subagents via `delegate_task` to protect the main context window.
 4. **Halt & Wait:** You MUST wait for the user's "Explicit Approval" before proceeding to Phase 1.
 
-### Phase 0.5: Subagent Dispatch (Mass Scale & Synthesis)
-1. **Mandatory Delegation:** You must NOT execute Phase 1 and Phase 2 entirely in the main thread.
-2. **Massive Parallel Sourcing:** You MUST spawn parallel subagents using `delegate_task` for literature discovery. **Each must retrieve and process over 700 papers:**
-   - **Subagent A (Scopus Dedicated):** Exclusively use `scopus-mcp` (or terminal scripts with the API key) to retrieve 700+ high-impact papers from Elsevier Scopus. Subagent A MUST process these and output a dedicated "Scopus Synthesis Report" summarizing the trends and findings. In this report, Subagent A MUST explicitly cite at least 50 key papers from its 700+ pool.
-   - **Subagent B (Google Science & Open Access):** Exclusively use `google-science-skills` APIs or Exa Search MCP to find 700+ complementary open-access papers. Subagent B MUST process these and output a dedicated "Open Science Synthesis Report". In this report, Subagent B MUST explicitly cite at least 50 key papers from its 700+ pool.
-3. Spawn Subagent A and B concurrently with appropriate toolsets (`['web', 'terminal']`). Ensure their scripts handle API pagination, data chunking, and local file storage (e.g., saving metadata to CSV/JSON) to reach the 700+ paper threshold without exceeding memory limits.
+### Phase 0.5: Background Sourcing & Full-Text Deep Reading
+1. **Background Process Sourcing:** Do NOT use main thread or short-lived subagents for extraction. You MUST write a local script to fetch exactly 30 high-impact papers (Q1/Q2) via APIs.
+2. **Full-Text Reading:** The script MUST download or scrape the *entire full text* of these 30 papers (not just abstracts).
+3. **Long-Running Execution:** Execute the script using `terminal(background=true, notify_on_complete=true)`. This prevents timeouts and saves tokens while the script runs autonomously. Wait for the background notification before proceeding.
+4. **Synthesis:** Once the background task finishes, read the locally saved full texts to generate the final Synthesis Reports.
 4. **Subagent C (Master Synthesizer):** After A and B complete, you MUST spawn a third subagent, **Subagent C**. Pass both the Scopus and Open Science synthesis reports (which contain ~100 cited papers combined) to Subagent C. Its sole goal is to merge, critically analyze, and curate a final master synthesis that directly addresses the overarching research direction, explicitly selecting and citing exactly the top 50 best papers for the final manuscript.
 
 ### Phase 1: Neural & Academic Discovery (`exa-search` + `scopus-mcp` + `google-science-skills`)
@@ -90,7 +89,11 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
 - `scripts/verify_urls.py`: Python script utilizing `ddgs` and `requests` to programmatically search and verify evidence URLs for Phase 4.5.
 
 ## ⚠️ Pitfalls & Strict Rules
+- **English Output ONLY:** All generated drafts, reports, and final documents MUST be written strictly in English, regardless of the conversational language.
 - **No Hallucinated Citations:** Every claim MUST map to a real URL/DOI found during Phase 1/2.
 - **Paywalled Literature (Elsevier/Scopus):** Standard APIs (Crossref/Exa) cannot fetch full text from closed databases. To bypass academic paywalls, spawn a subagent using **CloakBrowser** to navigate to the article URL directly—if the host machine is on a university network, this automatically leverages IP-based access while bypassing bot protections.
-- **Action Over Planning:** Do not tell the user what you *will* do. Immediately start executing Exa Search and CloakBrowser tool calls.
+- **Action Over Planning:** Do not tell the user what you *will* do. Immediately start executing Exa Search and Playwright tool calls.
 - **Table First:** Always build and present the literature/evidence table *before* writing the final prose.
+- **Intersection of Zero (Query Formulation):** When cross-analyzing highly specific variables (e.g., comparing 4 distinct cities simultaneously), NEVER combine them into a single academic API search query (e.g., Crossref/Semantic Scholar). This yields zero results. Deconstruct the research into atomic, independent searches (e.g., "Paris drought NPP", "Singapore UHI NPP") and synthesize the results post-retrieval.
+- **API Rate Limits:** Semantic Scholar public APIs aggressively rate-limit (HTTP 429). Implement delays, or use the Crossref API (`https://api.crossref.org/works?query=...`) as a more resilient fallback for bulk DOI metadata retrieval.
+- **Windows MSYS Python Execution (docx generation):** On Windows hosts, the `terminal` tool runs MSYS bash where `pip` and `python` may not map to the host's Python installation. When executing Python scripts to build `.docx` files, use `py -m pip` and `py script.py` to ensure the native Windows Python runtime is invoked.
