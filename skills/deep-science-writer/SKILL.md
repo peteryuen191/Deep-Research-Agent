@@ -26,7 +26,7 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
 2. **Full-Text Reading:** The script MUST download or scrape the *entire full text* of these 30 papers (not just abstracts).
 3. **Long-Running Execution:** Execute the script using `terminal(background=true, notify_on_complete=true)`. This prevents timeouts and saves tokens while the script runs autonomously. Wait for the background notification before proceeding.
 4. **Synthesis:** Once the background task finishes, read the locally saved full texts to generate the final Synthesis Reports.
-4. **Subagent C (Master Synthesizer):** After A and B complete, you MUST spawn a third subagent, **Subagent C**. Pass both the Scopus and Open Science synthesis reports (which contain ~100 cited papers combined) to Subagent C. Its sole goal is to merge, critically analyze, and curate a final master synthesis that directly addresses the overarching research direction, explicitly selecting and citing exactly the top 50 best papers for the final manuscript.
+4. **Subagent C (Master Synthesizer):** After A and B complete, you MUST spawn a third subagent, **Subagent C**. Pass both the Scopus and Open Science synthesis reports (which contain ~60 cited papers combined) to Subagent C. Its sole goal is to merge, critically analyze, and curate a final master synthesis that directly addresses the overarching research direction, explicitly selecting and citing at least 20 best papers for the final manuscript.
 
 ### Phase 1: Neural & Academic Discovery (`exa-search` + `scopus-mcp` + `google-science-skills`)
 1. **Journal Quality Filter**: ONLY include Q1 and Q2 papers. If a Q3 paper provides crucial evidence, you MUST explicitly mark it in the text/table with `[Q3]`. STRICTLY EXCLUDE any Q4 papers and ANY papers published by MDPI.
@@ -60,7 +60,8 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
 2. **DOI/URL Liveness Test**: Use the `terminal` tool (via `curl -I`), Exa Search MCP, or a Python script (e.g., `requests.get` / `urllib`) to ping every DOI or URL in the reference list. For bulk or programmatic URL resolution when links are missing, execute `scripts/verify_urls.py` (uses `ddgs` and `requests`).
    - If a DOI/URL is dead (404) or fake: **Delete the citation and rewrite the affected claim**, or pause to find the correct, live DOI.
 3. **Claim Grounding Check**: Cross-reference the specific claims made in the draft against the raw data/abstracts collected in Phases 1 & 2. 
-   - If a claim overstates the actual findings (e.g., claiming "cures" when the abstract says "mitigates"), down-modulate the claim to match the evidence.
+   - **Strict Literalism (就事論事)**: Never over-extend findings. If a claim overstates the actual findings, down-modulate it. 
+   - **No Concept Stitching**: Do not stitch a macro/global finding (e.g., "planetary boundaries") with a localized context (e.g., "European summer extremes") in the same citation unless the source explicitly connects them. Stick strictly to the literal facts.
 4. **Pass Condition**: Zero dead links, zero fake DOIs, and zero ungrounded claims. Only then proceed to Phase 5.
 
 ### Phase 5: Peer Review & Iteration (`remi`)
@@ -81,7 +82,7 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
 
 ### Phase 7: Knowledge Base & NotebookLM Integration
 1. **Obsidian Wiki Update**: Synthesize the core findings, literature insights, and strategic takeaways. Write or append this synthesis directly into the user's Obsidian Vault (`C:\Users\User\Documents\Obsidian Vault\Hermes\`) to maintain an ongoing, centralized knowledge base.
-2. **NotebookLM Source Ingestion**: Utilize the `notebooklm` MCP tools to create a dedicated notebook for this research project. Upload all verified reference materials, full texts, or abstracts gathered during Phase 1 & 2 into NotebookLM as sources. This ensures the literature is permanently available for interactive querying, deep dives, and audio overview generation.
+2. **NotebookLM Source Ingestion**: Utilize the `notebooklm` MCP tools to create a dedicated notebook for this research project. You MUST explicitly upload **every single cited reference** as an **individual source** into NotebookLM (do not just upload one compiled document). Upload the raw abstracts or full-texts for each cited paper so NotebookLM can accurately cross-reference and map individual citations.
 
 ## 📚 Linked References
 - `references/python-docx-manipulation.md`: Patterns for reading, creating, and safely removing XML paragraphs from `.docx` files.

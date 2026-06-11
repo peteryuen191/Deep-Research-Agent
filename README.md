@@ -10,7 +10,7 @@
 * **Automated Peer Review:** Integrates the `remi` peer-review skill *(named in tribute to my academic advisor, Remi Chauvy)* to aggressively strip "AI fluff" (e.g., "delve", "tapestry") and enforce rigorous academic tone.
 * **English Output Only:** Enforces strict English language generation for all academic reports and drafts, regardless of conversational language.
 * **Hands-Free Output:** Programmatically builds a fully formatted Microsoft Word document (`.docx`) with APA 7th hanging indents and auto-generated data visualizations.
-* **Knowledge Management Loop:** Automatically saves research summaries to your local **Obsidian Vault** and uploads reference materials to **Google NotebookLM** for future interactive queries.
+* **Knowledge Management Loop:** Automatically saves research summaries to your local **Obsidian Vault** and explicitly uploads **every individually cited reference** as a separate source into **Google NotebookLM** for precise audio overviews and cross-referencing.
 
 ---
 
