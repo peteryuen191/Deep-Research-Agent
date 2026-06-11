@@ -22,8 +22,9 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
 4. **Halt & Wait:** You MUST wait for the user's "Explicit Approval" before proceeding to Phase 1.
 
 ### Phase 0.5: Background Sourcing & Full-Text Deep Reading
-1. **Background Process Sourcing:** Do NOT use main thread or short-lived subagents for extraction. You MUST write a local script to fetch exactly 30 high-impact papers (Q1/Q2) via APIs.
-2. **Full-Text Reading:** The script MUST download or scrape the *entire full text* of these 30 papers (not just abstracts).
+1. **Large-Scale Abstract Screening:** Delegate subagents or write a background script to fetch a large pool of abstracts (e.g., 100+ papers) via APIs. Screen these abstracts for strict relevance and Q1/Q2 quality first.
+2. **Targeted Full-Text Downloading:** Once the abstracts are verified to match the research need, the script MUST download or scrape the *entire full text* of the filtered subset (e.g., top 20-30 papers).
+3. **Deep Reading & Filtering:** Read the downloaded full texts (specifically Methodology and Results) to extract the actual mechanisms. Discard any papers that fail to substantiate the claims in their abstracts or overstate findings.
 3. **Long-Running Execution:** Execute the script using `terminal(background=true, notify_on_complete=true)`. This prevents timeouts and saves tokens while the script runs autonomously. Wait for the background notification before proceeding.
 4. **Synthesis:** Once the background task finishes, read the locally saved full texts to generate the final Synthesis Reports.
 4. **Subagent C (Master Synthesizer):** After A and B complete, you MUST spawn a third subagent, **Subagent C**. Pass both the Scopus and Open Science synthesis reports (which contain ~60 cited papers combined) to Subagent C. Its sole goal is to merge, critically analyze, and curate a final master synthesis that directly addresses the overarching research direction, explicitly selecting and citing at least 20 best papers for the final manuscript.

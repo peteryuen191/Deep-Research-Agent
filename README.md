@@ -4,7 +4,7 @@
 
 ## 🌟 Key Features
 
-* **Precision Background Sourcing:** Utilizes long-running background processes to deeply scrape and read the *full text* of 30 highly relevant, high-impact papers, replacing shallow abstract-only scanning. **FULL-TEXT reading is absolutely mandatory; abstract-only shortcuts are strictly forbidden.**
+* **Precision Background Sourcing (Two-Stage Pipeline):** Subagents first fetch and screen a large pool of abstracts (e.g., 100+). For the highly relevant subset, the agent downloads and deeply reads the *full text* (Methodology, Results) to prevent abstract-induced hallucination. **FULL-TEXT verification of final claims is absolutely mandatory.**
 * **Strict Quality Control:** Explicitly targets Q1-Q2 journals. Marks Q3 when strictly necessary. **Bans all Q4 and MDPI publications.**
 * **Strict Compliance:** The agent is hard-coded to strictly follow every step in order. Skipping phases or taking shortcuts (like drafting without full-text verification) is strictly forbidden.
 * **Zero-Hallucination Guarantee (Phase 4.5):** Automatically runs live HTTP `requests` tests against every generated DOI to ensure 100% validity. Cross-references generated claims against raw full texts to prevent AI overstatement.
