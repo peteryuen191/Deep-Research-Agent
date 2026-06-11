@@ -37,8 +37,8 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
 4. **Academic Databases**: Call relevant `google-science-skills` (e.g., PubMed, Semantic Scholar) to pull additional peer-reviewed metadata.
 4. **Exhaustive Mapping (User Rule)**: Do NOT sample (e.g., just looking at 5 out of 20). Process the *exhaustive* set of relevant findings into a structured Markdown table: `| Title | Authors/Year | Key Finding | URL/DOI |`.
 
-### Phase 2: Deep Extraction (`playwright-mcp` + `deep-research`)
-1. **Dynamic Scraping**: For high-value sources that require JavaScript rendering, interaction, or are heavily dynamically loaded, use the **Playwright MCP** to navigate, wait for specific DOM selectors, and extract the full text.
+### Phase 2: Deep Extraction (`cloakbrowser` + `deep-research`)
+1. **Dynamic Scraping**: For high-value sources that require JavaScript rendering, interaction, or are heavily dynamically loaded, use the **CloakBrowser** tool/CLI to navigate, bypass anti-bot protections, wait for specific DOM selectors, and extract the full text. Do NOT use standard Playwright for this, as CloakBrowser is the primary scraper.
 2. **Synthesis**: Cross-reference extracted findings across multiple sources to validate claims and identify consensus vs. controversy. 
 
 ### Phase 3: Structural Drafting (`article-writing`)
@@ -91,6 +91,6 @@ This skill orchestrates a multi-stage pipeline for scientific research, combinin
 
 ## ⚠️ Pitfalls & Strict Rules
 - **No Hallucinated Citations:** Every claim MUST map to a real URL/DOI found during Phase 1/2.
-- **Paywalled Literature (Elsevier/Scopus):** Standard APIs (Crossref/Exa) cannot fetch full text from closed databases. To bypass academic paywalls, spawn a `playwright` subagent to navigate to the article URL directly—if the host machine is on a university network, this automatically leverages IP-based access.
-- **Action Over Planning:** Do not tell the user what you *will* do. Immediately start executing Exa Search and Playwright tool calls.
+- **Paywalled Literature (Elsevier/Scopus):** Standard APIs (Crossref/Exa) cannot fetch full text from closed databases. To bypass academic paywalls, spawn a subagent using **CloakBrowser** to navigate to the article URL directly—if the host machine is on a university network, this automatically leverages IP-based access while bypassing bot protections.
+- **Action Over Planning:** Do not tell the user what you *will* do. Immediately start executing Exa Search and CloakBrowser tool calls.
 - **Table First:** Always build and present the literature/evidence table *before* writing the final prose.
