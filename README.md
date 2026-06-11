@@ -1,14 +1,14 @@
 # Deep Research Agent
 
-**Deep Science Writer** is an industrial-grade, end-to-end scientific research pipeline and AI agent skill. Designed for the Hermes/ECC framework, it completely automates the literature review process: from massive-scale dual-source database querying (700+ papers) down to anti-hallucination verification, Nature/Science-level peer review, `.docx` compilation, and Obsidian/NotebookLM knowledge base ingestion.
+**Deep Science Writer** is an industrial-grade, end-to-end scientific research pipeline and AI agent skill. Designed for the Hermes/ECC framework, it completely automates the literature review process: from background full-text database querying down to anti-hallucination verification, Nature/Science-level peer review, `.docx` compilation, and Obsidian/NotebookLM knowledge base ingestion.
 
 ## 🌟 Key Features
 
-* **Massive Parallel Dual-Sourcing (1,400+ Papers):** Uses a Subagent architecture to concurrently scrape Elsevier Scopus (Subagent A) and Open Science databases like OpenAlex/Crossref (Subagent B).
-* **Funnel Synthesis:** Distills 1,400+ papers down to the top 50 most relevant, high-quality citations using a Master Synthesizer (Subagent C).
+* **Precision Background Sourcing:** Utilizes long-running background processes to deeply scrape and read the *full text* of 30 highly relevant, high-impact papers, replacing shallow abstract-only scanning.
 * **Strict Quality Control:** Explicitly targets Q1-Q2 journals. Marks Q3 when strictly necessary. **Bans all Q4 and MDPI publications.**
-* **Zero-Hallucination Guarantee (Phase 4.5):** Automatically runs live HTTP `requests` tests against every generated DOI to ensure 100% validity. Cross-references generated claims against raw abstracts to prevent AI overstatement.
+* **Zero-Hallucination Guarantee (Phase 4.5):** Automatically runs live HTTP `requests` tests against every generated DOI to ensure 100% validity. Cross-references generated claims against raw full texts to prevent AI overstatement.
 * **Automated Peer Review:** Integrates the `remi` peer-review skill *(named in tribute to my academic advisor, Remi Chauvy)* to aggressively strip "AI fluff" (e.g., "delve", "tapestry") and enforce rigorous academic tone.
+* **English Output Only:** Enforces strict English language generation for all academic reports and drafts, regardless of conversational language.
 * **Hands-Free Output:** Programmatically builds a fully formatted Microsoft Word document (`.docx`) with APA 7th hanging indents and auto-generated data visualizations.
 * **Knowledge Management Loop:** Automatically saves research summaries to your local **Obsidian Vault** and uploads reference materials to **Google NotebookLM** for future interactive queries.
 
@@ -33,7 +33,7 @@ pip install python-docx PyMuPDF requests matplotlib seaborn pandas
 Add these to your `config.yaml` or `claude_desktop_config.json`:
 
 * **Scopus MCP (`scopus-mcp`)**
-  * Required for Subagent A's premium literature retrieval.
+  * Required for premium literature retrieval.
   * **API Key:** Requires a free Elsevier Scopus API Key (`SCOPUS_API_KEY`). Apply at the [Elsevier Developer Portal](https://dev.elsevier.com/).
 * **NotebookLM MCP (`notebooklm-mcp-server`)**
   * Required for Phase 7 knowledge ingestion.
@@ -44,7 +44,7 @@ Add these to your `config.yaml` or `claude_desktop_config.json`:
 
 ### 4. Local Environment
 * **Obsidian:** The skill looks for `%OBSIDIAN_VAULT_PATH%\Hermes\` (fallback: `%USERPROFILE%\Documents\Obsidian Vault\Hermes\`). Update `SKILL.md` Phase 7 or set the environment variable if your vault is located elsewhere.
-* **Output Drive:** The skill saves the final `.docx` to `%OUTPUT_DIR%\Research_Report.docx` (fallback order: `D:\` → `%USERPROFILE%\Documents\`). Set the `%OUTPUT_DIR%` environment variable or adjust `SKILL.md` Phase 6 to match your system.
+* **Output Drive:** All outputs strictly save to `D:\Tommy` (or your configured environment).
 
 ---
 
@@ -54,7 +54,7 @@ Clone this repository into your agent's skills directory:
 
 ```bash
 cd <AGENT_SKILLS_DIR>
-git clone https://github.com/YOUR_USERNAME/deep-research-agent.git
+git clone https://github.com/CYC2002tommy/deep-research-agent.git
 ```
 *(Replace `<AGENT_SKILLS_DIR>` with your agent's skills path, e.g., `~/.hermes/skills/` or `.agents/skills/` for the ECC framework).*
 
@@ -62,9 +62,9 @@ git clone https://github.com/YOUR_USERNAME/deep-research-agent.git
 
 ## 🧠 The 7-Phase Architecture
 
-1. **Phase 0 & 0.5 (Plan & Dispatch):** The agent formulates a search plan and halts for your explicit approval. Once approved, it spawns parallel subagents to fetch 700+ papers each from Scopus and OpenAlex.
+1. **Phase 0 & 0.5 (Plan & Background Execution):** The agent formulates a search plan and halts for your explicit approval. Once approved, it launches a local background process (`terminal(background=true)`) to scrape the full text of exactly 30 high-impact papers via APIs.
 2. **Phase 1 (Discovery):** Enforces journal quality limits (Q1-Q2 only, bans MDPI).
-3. **Phase 2 (Deep Extraction):** Consolidates metadata, abstracts, and key findings.
+3. **Phase 2 (Deep Extraction):** Consolidates metadata, full texts, and key findings.
 4. **Phase 3 (Structural Drafting):** Outlines the article with evidence-backed claims and APA 7th citations.
 5. **Phase 4 & 4.5 (Anti-Hallucination):** Strips AI vocabulary. Pings all DOIs to ensure they resolve (404 = citation deleted).
 6. **Phase 5 (Remi Review):** An internal peer-review loop that critiques and rewrites the draft until academic standards are met. *(Named in tribute to my academic advisor, Remi Chauvy).* 
